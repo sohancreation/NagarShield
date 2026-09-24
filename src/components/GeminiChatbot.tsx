@@ -30,9 +30,12 @@ import {
   RefreshCw,
   Copy,
   Check,
+  Key,
 } from 'lucide-react';
 import { ChatMessage, GroundingSource, ChatRole, UrbanDataContext } from '../types';
 import { sendChatMessage, transcribeAudioBlob } from '../services/geminiService';
+import { saveStoredGeminiKey } from '../services/clientGemini';
+import { ApiKeyModal } from './ApiKeyModal';
 
 interface GeminiChatbotProps {
   selectedCity: string;
@@ -109,6 +112,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
   const [isMaximized, setIsMaximized] = useState(false);
   const [showRoleInfo, setShowRoleInfo] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
 
   // Persona & Model Selection
   const [selectedRole, setSelectedRole] = useState<string>('resilience_specialist');
@@ -240,6 +244,28 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
   const handleSendMessage = async (textToSend?: string) => {
     const text = (textToSend || inputText).trim();
     if (!text || isLoading) return;
+
+    // Detect if user pasted a Gemini API Key directly into chat
+    if (text.startsWith('AIzaSy') && text.length > 25) {
+      saveStoredGeminiKey(text);
+      setInputText('');
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `msg-${Date.now()}`,
+          role: 'user',
+          content: 'Updated Gemini API Key: `AIzaSy...`',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+        {
+          id: `key-confirm-${Date.now()}`,
+          role: 'model',
+          content: `🔑 **Gemini API Key Successfully Configured!**\n\nYour new Gemini API key has been securely saved to browser storage and is now active across all platform AI services (Chatbot, Planner Dashboard, Healthcare Triage, and Hazard Scanner).\n\nYou can now ask any question!`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+      return;
+    }
 
     const currentRoleObj = AVAILABLE_ROLES.find((r) => r.id === selectedRole) || AVAILABLE_ROLES[0];
 
@@ -394,8 +420,17 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
           </div>
         </div>
 
-        {/* Window Controls: Role Info, Minimize, Maximize, Close */}
+        {/* Window Controls: Key, Role Info, Minimize, Maximize, Close */}
         <div className="flex items-center gap-1 shrink-0 text-slate-400">
+          <button
+            type="button"
+            onClick={() => setIsKeyModalOpen(true)}
+            className="p-1.5 rounded-lg text-xs transition cursor-pointer hover:bg-slate-800 text-amber-400 hover:text-amber-300"
+            title="Configure Google Gemini API Key"
+          >
+            <Key className="w-3.5 h-3.5" />
+          </button>
+
           <button
             type="button"
             onClick={() => setShowRoleInfo(!showRoleInfo)}
@@ -814,6 +849,8 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
           </button>
         </form>
       </div>
+      {/* API Key Modal */}
+      <ApiKeyModal isOpen={isKeyModalOpen} onClose={() => setIsKeyModalOpen(false)} />
     </div>
   );
 };

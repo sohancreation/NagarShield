@@ -23,10 +23,12 @@ import {
   LogOut,
   ChevronDown,
   ShieldCheck,
+  Key,
 } from 'lucide-react';
 import { LiveMobilityData, LiveWeatherData } from '../types';
 import { UserProfile } from '../services/firebase';
 import { UpazilaLocation } from '../data/bangladeshLocations';
+import { ApiKeyModal } from './ApiKeyModal';
 
 interface HeaderProps {
   mobilityData: LiveMobilityData;
@@ -54,6 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAuthModal,
   onSignOut,
 }) => {
+  const [isKeyModalOpen, setIsKeyModalOpen] = React.useState(false);
   const tabs = [
     { id: 'overview', label: 'Overview & GIS Map', icon: Layers },
     { id: 'google-map', label: 'Google Maps Locator', icon: MapPin },
@@ -138,6 +141,18 @@ export const Header: React.FC<HeaderProps> = ({
               <MapPin className="w-3 h-3 text-sky-400" />
               <span>{activeLocation.name}, {activeLocation.zilla} ({activeLocation.division})</span>
               <ChevronDown className="w-3 h-3 text-sky-400/80" />
+            </button>
+
+            {/* Gemini API Key Config */}
+            <button
+              type="button"
+              id="header-api-key-btn"
+              onClick={() => setIsKeyModalOpen(true)}
+              className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded text-[11px] font-medium transition cursor-pointer"
+              title="Configure Google Gemini API Key"
+            >
+              <Key className="w-3 h-3 text-amber-400" />
+              <span>API Key</span>
             </button>
 
             {/* Auth / Profile State */}
@@ -262,6 +277,9 @@ export const Header: React.FC<HeaderProps> = ({
           );
         })}
       </nav>
+
+      {/* API Key Modal */}
+      <ApiKeyModal isOpen={isKeyModalOpen} onClose={() => setIsKeyModalOpen(false)} />
     </header>
   );
 };

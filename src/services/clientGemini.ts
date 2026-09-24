@@ -15,9 +15,23 @@ export interface ChatResponse {
   error?: string;
 }
 
-const CLIENT_GEMINI_KEY =
+export const DEFAULT_GEMINI_KEY =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) ||
   'AIzaSyA8yty3ud_nvveJvI-HEj-sha8H5pj43JE';
+
+export function getStoredGeminiKey(): string {
+  if (typeof window !== 'undefined') {
+    const userKey = localStorage.getItem('nagarshield_user_gemini_api_key');
+    if (userKey && userKey.trim()) return userKey.trim();
+  }
+  return DEFAULT_GEMINI_KEY;
+}
+
+export function saveStoredGeminiKey(key: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('nagarshield_user_gemini_api_key', key.trim());
+  }
+}
 
 const CANDIDATE_MODELS = [
   'gemini-flash-lite-latest',
@@ -35,11 +49,12 @@ export async function callGeminiRest(
   systemInstruction?: string,
   generationConfig?: any
 ): Promise<{ text: string; model: string }> {
+  const currentKey = getStoredGeminiKey();
   let lastError: any = null;
 
   for (const model of CANDIDATE_MODELS) {
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${CLIENT_GEMINI_KEY}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${currentKey}`;
       const payload: any = { contents };
 
       if (systemInstruction) {
@@ -60,7 +75,8 @@ export async function callGeminiRest(
 
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({}));
-        throw new Error(errJson?.error?.message || `HTTP ${res.status}`);
+        const errMsg = errJson?.error?.message || `HTTP ${res.status}`;
+        throw new Error(errMsg);
       }
 
       const data = await res.json();
@@ -70,7 +86,11 @@ export async function callGeminiRest(
       }
     } catch (err: any) {
       lastError = err;
-      console.warn(`[Client Gemini] Model ${model} fallback notice:`, err?.message || err);
+      console.warn(`[Client Gemini] Model ${model} notice:`, err?.message || err);
+      // If key is reported as leaked, don't keep polling other models with the same dead key
+      if (err?.message?.includes('leaked') || err?.message?.includes('PERMISSION_DENIED')) {
+        break;
+      }
     }
   }
 
@@ -95,7 +115,17 @@ export async function sendClientChatMessage(
 
   const sysInstruction = roleInstructions[roleId] || roleInstructions.resilience_specialist;
 
-  const contents = messages.slice(-10).map((msg) => ({
+  // Gemini API requires the conversation to start with a 'user' turn
+  let cleaned = messages.slice(-10);
+  while (cleaned.length > 0 && cleaned[0].role !== 'user') {
+    cleaned = cleaned.slice(1);
+  }
+  if (cleaned.length === 0) {
+    const lastPrompt = messages[messages.length - 1]?.content || 'Provide Dhaka urban resilience status.';
+    cleaned = [{ role: 'user', content: lastPrompt }];
+  }
+
+  const contents = cleaned.map((msg) => ({
     role: msg.role === 'user' ? 'user' : 'model',
     parts: [{ text: msg.content }],
   }));
@@ -118,10 +148,15 @@ export async function sendClientChatMessage(
     };
   } catch (err: any) {
     const lastMsg = messages[messages.length - 1]?.content || 'Resilience Query';
+    const isLeaked = err?.message?.includes('leaked') || err?.message?.includes('PERMISSION_DENIED');
+    const notice = isLeaked
+      ? `\n\n> ⚠️ **Google API Notice:** The configured Gemini API key was reported as leaked and revoked by Google. To enable live custom answers, create a fresh free key at **[Google AI Studio (aistudio.google.com/apikey)](https://aistudio.google.com/apikey)** and click the **🔑 API Key** button in the header or type \`AIzaSy...\` in this chat.`
+      : '';
+
     return {
       success: true,
       role: 'model',
-      content: `### 🛡️ NagarShield Resilience Advisory (${cityName})\n\n**Response to:** "${lastMsg}"\n\n- **Precipitation & Drainage:** Active monsoon monitoring suggests prioritizing elevated arterial bypass corridors.\n- **Emergency Access:** Keep major medical and trauma corridors clear of surface waterlogging.\n- **Action Directive:** Deploy municipal mobile pump stations at low-lying catchment zones.`,
+      content: `### 🛡️ NagarShield Resilience Advisory (${cityName})\n\n**Assessment for:** "${lastMsg}"\n\n- **Precipitation & Drainage:** Active monsoon monitoring suggests prioritizing elevated arterial bypass corridors.\n- **Emergency Access:** Keep major medical and trauma corridors clear of surface waterlogging.\n- **Action Directive:** Deploy municipal mobile pump stations at low-lying catchment zones.${notice}`,
       model: 'client-resilience-fallback',
       groundingType: 'none',
       sources: [],
