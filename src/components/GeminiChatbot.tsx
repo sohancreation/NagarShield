@@ -246,7 +246,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
     if (!text || isLoading) return;
 
     // Detect if user pasted a Gemini API Key directly into chat
-    if (text.startsWith('AIzaSy') && text.length > 25) {
+    if ((text.startsWith('AIzaSy') || text.startsWith('AQ.') || text.startsWith('AIza')) && text.length > 25) {
       saveStoredGeminiKey(text);
       setInputText('');
       setMessages((prev) => [
@@ -254,7 +254,7 @@ export const GeminiChatbot: React.FC<GeminiChatbotProps> = ({
         {
           id: `msg-${Date.now()}`,
           role: 'user',
-          content: 'Updated Gemini API Key: `AIzaSy...`',
+          content: `Updated Gemini API Key: \`${text.slice(0, 8)}...\``,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
         {

@@ -77,7 +77,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, onKey
                 setIsSaved(false);
                 setStatusMsg('');
               }}
-              placeholder="AIzaSy..."
+              placeholder="AQ... or AIzaSy..."
               className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-sky-500 transition font-mono"
             />
           </div>
