@@ -30,10 +30,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (saved === 'light' || saved === 'dark' || saved === 'night') {
         return saved;
       }
-      // If user has system preference for dark, start with dark, otherwise dark by default for resilience dashboard
-      return 'dark';
+      return 'light';
     } catch {
-      return 'dark';
+      return 'light';
     }
   });
 
