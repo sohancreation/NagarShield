@@ -1,0 +1,424 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+ * NAGARSHIELD URBAN RESILIENCE THEME SYSTEM
+ * Supports:
+ *  - [data-theme="light"] : Crisp Day Clarity with neutral high-contrast slate
+ *  - [data-theme="dark"]  : Deep Precision Slate (#0b1120 / #111827 / #1e293b)
+ *  - [data-theme="night"] : Tactical OLED True Black (#000000) for EOC ops
+ * ========================================================================== */
+
+:root {
+  color-scheme: light dark;
+}
+
+/* Global ultra-smooth transitions between themes */
+html, body, header, aside, main, div, button, input, select, textarea {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* ==========================================================================
+ * 1. LIGHT THEME (Day Clarity)
+ * ========================================================================== */
+[data-theme="light"] {
+  color-scheme: light;
+}
+[data-theme="light"] body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* ==========================================================================
+ * 2. DARK THEME (Precision Deep Slate)
+ * Aesthetic: Professional enterprise municipal operations, deep slate surfaces,
+ * crisp borders, luminous typography, and calibrated accent badges.
+ * ========================================================================== */
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme="dark"] body {
+  background-color: #0b1120;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] #nagarshield-main-content-wrap {
+  background-color: #0b1120 !important;
+}
+
+[data-theme="dark"] header {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+
+/* Base dark container & card surfaces */
+[data-theme="dark"] .bg-white {
+  background-color: #111827 !important;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .bg-slate-50 {
+  background-color: #0c1222 !important;
+}
+
+[data-theme="dark"] .bg-slate-100 {
+  background-color: #1a2436 !important;
+}
+
+[data-theme="dark"] .hover\:bg-slate-50:hover {
+  background-color: #162032 !important;
+}
+
+[data-theme="dark"] .hover\:bg-slate-100:hover {
+  background-color: #1f2d45 !important;
+}
+
+[data-theme="dark"] .hover\:bg-slate-200:hover {
+  background-color: #273752 !important;
+}
+
+[data-theme="dark"] .bg-slate-200 {
+  background-color: #223048 !important;
+}
+
+/* Dark mode border hierarchy */
+[data-theme="dark"] .border-slate-100 {
+  border-color: #192338 !important;
+}
+
+[data-theme="dark"] .border-slate-200,
+[data-theme="dark"] .border-slate-200\/90,
+[data-theme="dark"] .border-slate-200\/80 {
+  border-color: #1e293b !important;
+}
+
+[data-theme="dark"] .border-slate-300 {
+  border-color: #334155 !important;
+}
+
+/* Dark mode text hierarchy for WCAG AA+ high contrast */
+[data-theme="dark"] .text-slate-900 {
+  color: #f8fafc !important;
+}
+[data-theme="dark"] .text-slate-800 {
+  color: #f1f5f9 !important;
+}
+[data-theme="dark"] .text-slate-700 {
+  color: #e2e8f0 !important;
+}
+[data-theme="dark"] .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .text-slate-500 {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .text-slate-400 {
+  color: #64748b;
+}
+
+/* High-contrast status badges in Dark mode (avoid washed-out white/pastel clashes) */
+[data-theme="dark"] .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.16) !important;
+}
+[data-theme="dark"] .text-emerald-700,
+[data-theme="dark"] .text-emerald-800,
+[data-theme="dark"] .text-emerald-900 {
+  color: #34d399 !important;
+}
+[data-theme="dark"] .border-emerald-200,
+[data-theme="dark"] .border-emerald-300 {
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+[data-theme="dark"] .bg-sky-50,
+[data-theme="dark"] .bg-sky-50\/80 {
+  background-color: rgba(14, 165, 233, 0.16) !important;
+}
+[data-theme="dark"] .text-sky-700,
+[data-theme="dark"] .text-sky-800,
+[data-theme="dark"] .text-sky-900 {
+  color: #38bdf8 !important;
+}
+[data-theme="dark"] .border-sky-100,
+[data-theme="dark"] .border-sky-200,
+[data-theme="dark"] .border-sky-200\/80,
+[data-theme="dark"] .border-sky-300 {
+  border-color: rgba(14, 165, 233, 0.35) !important;
+}
+
+[data-theme="dark"] .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.16) !important;
+}
+[data-theme="dark"] .text-amber-700,
+[data-theme="dark"] .text-amber-800,
+[data-theme="dark"] .text-amber-900 {
+  color: #fbbf24 !important;
+}
+[data-theme="dark"] .border-amber-100,
+[data-theme="dark"] .border-amber-200,
+[data-theme="dark"] .border-amber-300 {
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+[data-theme="dark"] .bg-orange-50 {
+  background-color: rgba(249, 115, 22, 0.16) !important;
+}
+[data-theme="dark"] .text-orange-700,
+[data-theme="dark"] .text-orange-800 {
+  color: #fb923c !important;
+}
+[data-theme="dark"] .border-orange-200,
+[data-theme="dark"] .border-orange-300 {
+  border-color: rgba(249, 115, 22, 0.35) !important;
+}
+
+[data-theme="dark"] .bg-rose-50,
+[data-theme="dark"] .bg-rose-50\/70 {
+  background-color: rgba(244, 63, 94, 0.16) !important;
+}
+[data-theme="dark"] .text-rose-700,
+[data-theme="dark"] .text-rose-800 {
+  color: #fb7185 !important;
+}
+[data-theme="dark"] .border-rose-200,
+[data-theme="dark"] .border-rose-300 {
+  border-color: rgba(244, 63, 94, 0.35) !important;
+}
+
+[data-theme="dark"] .bg-indigo-50,
+[data-theme="dark"] .bg-indigo-50\/70 {
+  background-color: rgba(99, 102, 241, 0.16) !important;
+}
+[data-theme="dark"] .text-indigo-700,
+[data-theme="dark"] .text-indigo-800,
+[data-theme="dark"] .text-indigo-900 {
+  color: #a5b4fc !important;
+}
+[data-theme="dark"] .border-indigo-100,
+[data-theme="dark"] .border-indigo-200,
+[data-theme="dark"] .border-indigo-200\/80 {
+  border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+/* Subtle corner tints in metric cards */
+[data-theme="dark"] .group:hover .bg-sky-50,
+[data-theme="dark"] .group:hover .bg-amber-50,
+[data-theme="dark"] .group:hover .bg-rose-50 {
+  opacity: 0.25;
+}
+
+/* Form Controls & Inputs */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #1e293b !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Drawer & Modals */
+[data-theme="dark"] .shadow-2xl,
+[data-theme="dark"] .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* ==========================================================================
+ * 3. TACTICAL NIGHT THEME (OLED #000000 True Black)
+ * Optimized for Emergency Operations Centers (EOC), night-shift surveillance,
+ * and high-contrast glare reduction.
+ * ========================================================================== */
+[data-theme="night"] {
+  color-scheme: dark;
+}
+
+[data-theme="night"] body {
+  background-color: #000000;
+  color: #f8fafc;
+}
+
+[data-theme="night"] #nagarshield-main-content-wrap {
+  background-color: #000000 !important;
+}
+
+[data-theme="night"] header {
+  background-color: #000000 !important;
+  border-color: #111a2e !important;
+}
+
+/* OLED Deep Card Surfaces */
+[data-theme="night"] .bg-white {
+  background-color: #060912 !important;
+  border-color: #111a2e !important;
+  color: #ffffff;
+}
+
+[data-theme="night"] .bg-slate-50 {
+  background-color: #000000 !important;
+}
+
+[data-theme="night"] .bg-slate-100 {
+  background-color: #0b111e !important;
+}
+
+[data-theme="night"] .hover\:bg-slate-50:hover {
+  background-color: #0c1322 !important;
+}
+
+[data-theme="night"] .hover\:bg-slate-100:hover {
+  background-color: #111a2c !important;
+}
+
+[data-theme="night"] .hover\:bg-slate-200:hover {
+  background-color: #18243b !important;
+}
+
+[data-theme="night"] .bg-slate-200 {
+  background-color: #152033 !important;
+}
+
+/* Hairline high-contrast borders */
+[data-theme="night"] .border-slate-100,
+[data-theme="night"] .border-slate-200,
+[data-theme="night"] .border-slate-200\/90,
+[data-theme="night"] .border-slate-200\/80 {
+  border-color: #141f36 !important;
+}
+
+[data-theme="night"] .border-slate-300 {
+  border-color: #1e2e4f !important;
+}
+
+/* Night text colors with crisp luminescence */
+[data-theme="night"] .text-slate-900 {
+  color: #ffffff !important;
+}
+[data-theme="night"] .text-slate-800 {
+  color: #f8fafc !important;
+}
+[data-theme="night"] .text-slate-700 {
+  color: #e2e8f0 !important;
+}
+[data-theme="night"] .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+[data-theme="night"] .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+/* Vibrant Tactical Safety Accents */
+[data-theme="night"] .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.18) !important;
+}
+[data-theme="night"] .text-emerald-700,
+[data-theme="night"] .text-emerald-800,
+[data-theme="night"] .text-emerald-900 {
+  color: #34d399 !important;
+}
+[data-theme="night"] .border-emerald-200,
+[data-theme="night"] .border-emerald-300 {
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+[data-theme="night"] .bg-sky-50,
+[data-theme="night"] .bg-sky-50\/80 {
+  background-color: rgba(14, 165, 233, 0.18) !important;
+}
+[data-theme="night"] .text-sky-700,
+[data-theme="night"] .text-sky-800,
+[data-theme="night"] .text-sky-900 {
+  color: #38bdf8 !important;
+}
+[data-theme="night"] .border-sky-100,
+[data-theme="night"] .border-sky-200,
+[data-theme="night"] .border-sky-200\/80,
+[data-theme="night"] .border-sky-300 {
+  border-color: rgba(14, 165, 233, 0.4) !important;
+}
+
+[data-theme="night"] .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+}
+[data-theme="night"] .text-amber-700,
+[data-theme="night"] .text-amber-800,
+[data-theme="night"] .text-amber-900 {
+  color: #fbbf24 !important;
+}
+[data-theme="night"] .border-amber-100,
+[data-theme="night"] .border-amber-200,
+[data-theme="night"] .border-amber-300 {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+[data-theme="night"] .bg-rose-50,
+[data-theme="night"] .bg-rose-50\/70 {
+  background-color: rgba(244, 63, 94, 0.18) !important;
+}
+[data-theme="night"] .text-rose-700,
+[data-theme="night"] .text-rose-800 {
+  color: #fb7185 !important;
+}
+[data-theme="night"] .border-rose-200,
+[data-theme="night"] .border-rose-300 {
+  border-color: rgba(244, 63, 94, 0.4) !important;
+}
+
+[data-theme="night"] .bg-indigo-50,
+[data-theme="night"] .bg-indigo-50\/70 {
+  background-color: rgba(99, 102, 241, 0.18) !important;
+}
+[data-theme="night"] .text-indigo-700,
+[data-theme="night"] .text-indigo-800,
+[data-theme="night"] .text-indigo-900 {
+  color: #a5b4fc !important;
+}
+[data-theme="night"] .border-indigo-100,
+[data-theme="night"] .border-indigo-200,
+[data-theme="night"] .border-indigo-200\/80 {
+  border-color: rgba(99, 102, 241, 0.4) !important;
+}
+
+/* Night inputs */
+[data-theme="night"] input,
+[data-theme="night"] select,
+[data-theme="night"] textarea {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #152033 !important;
+}
+
+[data-theme="night"] input::placeholder,
+[data-theme="night"] textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* ==========================================================================
+ * 4. TACTICAL NIGHT VISION HUD FILTER (.night-hud-active)
+ * Subtle green-amber phosphor shift and glare reduction for low-light EOCs
+ * ========================================================================== */
+.night-hud-active {
+  filter: contrast(106%) brightness(96%);
+}
+
+.night-hud-active header,
+.night-hud-active aside {
+  border-color: rgba(16, 185, 129, 0.28) !important;
+}
+
+/* Custom Scrollbar for Dark/Night Mode */
+[data-theme="dark"] ::-webkit-scrollbar-thumb,
+[data-theme="night"] ::-webkit-scrollbar-thumb {
+  background-color: #1e293b;
+  border-radius: 4px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track,
+[data-theme="night"] ::-webkit-scrollbar-track {
+  background-color: transparent;
+}
