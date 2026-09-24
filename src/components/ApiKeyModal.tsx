@@ -15,25 +15,37 @@ interface ApiKeyModalProps {
 
 export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, onKeyUpdated }) => {
   const [apiKey, setApiKey] = useState(() => getStoredGeminiKey());
+  const [mapsKey, setMapsKey] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('nagarshield_user_maps_api_key');
+      if (stored && stored.trim()) return stored.trim();
+    }
+    return (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GOOGLE_MAPS_API_KEY) || '';
+  });
   const [isSaved, setIsSaved] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
 
   if (!isOpen) return null;
 
   const handleSave = () => {
-    const trimmed = apiKey.trim();
-    if (!trimmed) {
-      setStatusMsg('Please enter a valid Gemini API key.');
-      return;
+    const trimmedGemini = apiKey.trim();
+    const trimmedMaps = mapsKey.trim();
+
+    if (trimmedGemini) {
+      saveStoredGeminiKey(trimmedGemini);
+      if (onKeyUpdated) onKeyUpdated(trimmedGemini);
     }
-    saveStoredGeminiKey(trimmed);
+
+    if (trimmedMaps && typeof window !== 'undefined') {
+      localStorage.setItem('nagarshield_user_maps_api_key', trimmedMaps);
+    }
+
     setIsSaved(true);
-    setStatusMsg('API Key successfully saved! Active across all AI features.');
-    if (onKeyUpdated) onKeyUpdated(trimmed);
+    setStatusMsg('API Keys successfully saved and applied!');
     setTimeout(() => {
       setIsSaved(false);
       onClose();
-    }, 1500);
+    }, 1200);
   };
 
   return (
@@ -67,7 +79,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, onKey
 
           <div>
             <label className="block text-xs font-medium text-slate-400 mb-1.5">
-              Gemini API Key
+              Gemini AI API Key
             </label>
             <input
               type="password"
@@ -78,6 +90,23 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, onKey
                 setStatusMsg('');
               }}
               placeholder="AQ... or AIzaSy..."
+              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-sky-500 transition font-mono"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-1.5">
+              Google Maps API Key (Optional)
+            </label>
+            <input
+              type="password"
+              value={mapsKey}
+              onChange={(e) => {
+                setMapsKey(e.target.value);
+                setIsSaved(false);
+                setStatusMsg('');
+              }}
+              placeholder="AIzaSy..."
               className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-sky-500 transition font-mono"
             />
           </div>

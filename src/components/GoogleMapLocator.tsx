@@ -94,9 +94,9 @@ export const GoogleMapLocator: React.FC<GoogleMapLocatorProps> = ({
   className = '',
   isCompact = false,
 }) => {
-  // API Key priority: VITE env var, injected runtime secret, or provisioned Demo Key
   const apiKey =
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
+    (typeof window !== 'undefined' && localStorage.getItem('nagarshield_user_maps_api_key')) ||
     (typeof window !== 'undefined' && (window as any).__GOOGLE_MAPS_API_KEY__) ||
     '';
 
