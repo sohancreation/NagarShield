@@ -27,6 +27,7 @@ import {
 import { UrbanZone, RoadSegment, JunctionNode, ResilienceWeights, AiRecommendation, LiveWeatherData } from '../types';
 import { UpazilaLocation, DEFAULT_BANGLADESH_LOCATION } from '../data/bangladeshLocations';
 import { getCustomizedRecommendations } from '../data/locationAdapters';
+import { generateAiPlan } from '../services/geminiService';
 
 interface PlannerTrafficDashboardProps {
   zones: UrbanZone[];
@@ -146,28 +147,22 @@ export const PlannerTrafficDashboard: React.FC<PlannerTrafficDashboardProps> = (
   const handleGenerateAiPlan = async () => {
     setIsLoadingAi(true);
     try {
-      const res = await fetch('/api/ai/planner', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          location: activeLocation.name,
-          zilla: activeLocation.zilla,
-          division: activeLocation.division,
-          canalOrRiver: activeLocation.canalOrRiver,
-          hospital: activeLocation.criticalFacilities.hospital,
-          rainMm: weatherData?.rain1hMm ?? 0,
-          temperatureC: weatherData?.temperatureC ?? 31,
-          zone: selectedZone.name,
-          floodRisk: selectedZone.floodRiskScore,
-          heatRisk: selectedZone.heatRiskScore,
-          trafficRisk: selectedZone.trafficRiskScore,
-          populationExposure: selectedZone.populationExposureScore,
-          customFocus: customGoal,
-        }),
+      const data = await generateAiPlan({
+        location: activeLocation.name,
+        zilla: activeLocation.zilla,
+        division: activeLocation.division,
+        canalOrRiver: activeLocation.canalOrRiver,
+        hospital: activeLocation.criticalFacilities.hospital,
+        rainMm: weatherData?.rain1hMm ?? 0,
+        temperatureC: weatherData?.temperatureC ?? 31,
+        zone: selectedZone.name,
+        floodRisk: selectedZone.floodRiskScore,
+        heatRisk: selectedZone.heatRiskScore,
+        trafficRisk: selectedZone.trafficRiskScore,
+        populationExposure: selectedZone.populationExposureScore,
+        customFocus: customGoal,
       });
 
-      if (!res.ok) throw new Error('API request failed');
-      const data = await res.json();
       if (data.recommendations && Array.isArray(data.recommendations) && data.recommendations.length > 0) {
         setRecommendations(data.recommendations);
       }
