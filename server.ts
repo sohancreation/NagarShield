@@ -15,7 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -38,6 +38,72 @@ function getGeminiClient(): GoogleGenAI | null {
     });
   }
   return geminiClient;
+}
+
+/**
+ * Resilient multi-tier model caller:
+ * Automatically falls back across gemini-3.6-flash, gemini-3.1-flash-lite,
+ * gemini-flash-lite-latest, gemini-3.8-flash, etc.
+ * Gracefully handles search/maps grounding quota errors (429) by retrying without tools.
+ */
+async function generateWithGeminiFallback(
+  client: GoogleGenAI,
+  params: {
+    preferredModels: string[];
+    contents: any;
+    config?: any;
+  }
+): Promise<{ response: any; modelUsed: string }> {
+  const candidateModels = Array.from(
+    new Set([
+      ...params.preferredModels,
+      'gemini-3.6-flash',
+      'gemini-3.1-flash-lite',
+      'gemini-flash-lite-latest',
+      'gemini-3.8-flash',
+      'gemini-3.5-flash',
+    ])
+  );
+
+  let lastError: any = null;
+  for (const model of candidateModels) {
+    try {
+      const response = await client.models.generateContent({
+        model,
+        contents: params.contents,
+        config: params.config,
+      });
+      return { response, modelUsed: model };
+    } catch (err: any) {
+      lastError = err;
+      const errMsg = err?.message || '';
+      const isToolIssue =
+        params.config?.tools &&
+        (err?.status === 429 || errMsg.includes('quota') || err?.status === 400);
+
+      if (isToolIssue) {
+        try {
+          const configNoTools = { ...params.config };
+          delete configNoTools.tools;
+          delete configNoTools.toolConfig;
+          const retryRes = await client.models.generateContent({
+            model,
+            contents: params.contents,
+            config: configNoTools,
+          });
+          return { response: retryRes, modelUsed: model };
+        } catch (innerErr) {
+          lastError = innerErr;
+        }
+      }
+
+      console.warn(
+        `[Gemini Engine] Model '${model}' notice (${err?.status || err?.message?.slice(0, 80)}). Trying fallback...`
+      );
+    }
+  }
+
+  throw lastError;
 }
 
 // 1. Health check API
@@ -664,8 +730,8 @@ Return a valid JSON object matching this structure:
 }
 Return only JSON.`;
 
-    const response = await client.models.generateContent({
-      model: 'gemini-3.8-flash',
+    const { response, modelUsed } = await generateWithGeminiFallback(client, {
+      preferredModels: ['gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-3.1-flash-lite'],
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -673,9 +739,10 @@ Return only JSON.`;
     });
 
     const jsonText = response.text?.trim() || '';
-    const parsed = JSON.parse(jsonText);
+    const cleanJson = jsonText.replace(/```json/g, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(cleanJson);
     res.json({
-      source: 'gemini_3_8_flash',
+      source: modelUsed,
       ...parsed,
     });
   } catch (err: unknown) {
@@ -879,8 +946,8 @@ ${dynamicAssessment}
       config.tools = [{ googleSearch: {} }];
     }
 
-    const response = await client.models.generateContent({
-      model: targetModel,
+    const { response, modelUsed } = await generateWithGeminiFallback(client, {
+      preferredModels: [targetModel, 'gemini-3.6-flash', 'gemini-3.1-flash-lite'],
       contents,
       config,
     });
@@ -928,7 +995,7 @@ ${dynamicAssessment}
       success: true,
       role: 'model',
       content: replyText,
-      model: targetModel,
+      model: modelUsed,
       groundingType: grounding,
       sources,
     });
@@ -1184,8 +1251,8 @@ Review the ground-truth telemetry for ${loc.name} (${loc.zilla}, ${loc.division}
 
 Write a concise 2-sentence executive advisory explaining the current network status in ${loc.name} and the #1 most effective municipal recommendation for the current weather window. Do not invent hazards if conditions are nominal.`;
 
-      const response = await client.models.generateContent({
-        model: 'gemini-3.8-flash',
+      const { response } = await generateWithGeminiFallback(client, {
+        preferredModels: ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.8-flash'],
         contents: prompt,
       });
       if (response.text?.trim()) {
@@ -1269,8 +1336,8 @@ Perform clinical analysis and return a JSON object with:
 
 IMPORTANT: Respond ONLY with valid JSON conforming to the structure above. No markdown fences, no surrounding text.`;
 
-      const response = await client.models.generateContent({
-        model: 'gemini-3.8-flash',
+      const { response } = await generateWithGeminiFallback(client, {
+        preferredModels: ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3.8-flash'],
         contents: prompt,
       });
 
@@ -1531,8 +1598,8 @@ app.post('/api/ai/transcribe', async (req, res) => {
       },
     };
 
-    const response = await client.models.generateContent({
-      model: 'gemini-3.5-transcribe',
+    const { response, modelUsed } = await generateWithGeminiFallback(client, {
+      preferredModels: ['gemini-3.6-flash', 'gemini-3.5-transcribe', 'gemini-3.1-flash-lite'],
       contents: {
         parts: [
           audioPart,
@@ -1546,7 +1613,7 @@ app.post('/api/ai/transcribe', async (req, res) => {
     res.json({
       success: true,
       text: transcribedText || 'Heavy waterlogging reported on the southern arterial corridor. Requesting emergency bypass routing.',
-      model: 'gemini-3.5-transcribe',
+      model: modelUsed,
     });
   } catch (err: any) {
     console.error('Audio Transcription error (gemini-3.5-transcribe):', err?.message || err);
@@ -1607,8 +1674,8 @@ app.post('/api/ai/grounded-query', async (req, res) => {
       config.tools = [{ googleSearch: {} }];
     }
 
-    const response = await client.models.generateContent({
-      model: 'gemini-3.5-flash',
+    const { response, modelUsed } = await generateWithGeminiFallback(client, {
+      preferredModels: ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite'],
       contents: query,
       config,
     });
@@ -1643,7 +1710,7 @@ app.post('/api/ai/grounded-query', async (req, res) => {
       success: true,
       text: response.text || '',
       sources,
-      model: 'gemini-3.5-flash',
+      model: modelUsed,
     });
   } catch (err: any) {
     console.error('Grounded query error:', err?.message || err);
