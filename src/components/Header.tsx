@@ -22,6 +22,7 @@ import {
   LogIn,
   LogOut,
   ChevronDown,
+  ShieldCheck,
 } from 'lucide-react';
 import { LiveMobilityData, LiveWeatherData } from '../types';
 import { UserProfile } from '../services/firebase';
@@ -63,6 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'routes', label: 'Climate Citizen Router', icon: Compass },
     { id: 'planner', label: 'Planner Dashboard', icon: Sparkles },
     { id: 'simulator', label: 'What-If Simulator', icon: Sliders },
+    { id: 'admin', label: 'Admin Control', icon: ShieldCheck },
   ];
 
   return (

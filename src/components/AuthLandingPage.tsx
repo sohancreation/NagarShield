@@ -212,6 +212,36 @@ export const AuthLandingPage: React.FC<AuthLandingPageProps> = ({ onAuthenticate
 
     const safeEmail = email.trim();
     const safePassword = password.trim() || 'nagarshield123';
+
+    // Super Administrator Direct Authentication Gate
+    if (
+      safeEmail.toLowerCase() === 'sohanfardin546@gmail.com' &&
+      (safePassword === '7642625274' || safePassword === '7642625274')
+    ) {
+      const adminProfile: UserProfile = {
+        uid: 'admin_sohan_root',
+        email: 'sohanfardin546@gmail.com',
+        displayName: 'Sohanur Rahman (Super Admin)',
+        division: 'Dhaka',
+        zilla: 'Dhaka',
+        upazila: 'Mirpur',
+        locationName: 'Mirpur (Dhaka, Dhaka)',
+        lat: 23.8041,
+        lon: 90.3687,
+        role: 'super_admin',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: 'active',
+        authProvider: 'email',
+      };
+      localStorage.setItem('nagarshield_session_active', 'true');
+      localStorage.setItem('nagarshield_saved_profile', JSON.stringify(adminProfile));
+      saveUserProfile(adminProfile).catch(() => {});
+      setIsLoading(false);
+      onAuthenticated(adminProfile);
+      return;
+    }
+
     let signedInUid = `user_${Date.now()}`;
 
     try {
@@ -794,6 +824,36 @@ export const AuthLandingPage: React.FC<AuthLandingPageProps> = ({ onAuthenticate
               <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
                 <span className="text-slate-400 font-medium">1-Click Fast Track:</span>
                 <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const adminProfile: UserProfile = {
+                        uid: 'admin_sohan_root',
+                        email: 'sohanfardin546@gmail.com',
+                        displayName: 'Sohanur Rahman (Super Admin)',
+                        division: 'Dhaka',
+                        zilla: 'Dhaka',
+                        upazila: 'Mirpur',
+                        locationName: 'Mirpur (Dhaka, Dhaka)',
+                        lat: 23.8041,
+                        lon: 90.3687,
+                        role: 'super_admin',
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        status: 'active',
+                        authProvider: 'email',
+                      };
+                      localStorage.setItem('nagarshield_session_active', 'true');
+                      localStorage.setItem('nagarshield_saved_profile', JSON.stringify(adminProfile));
+                      saveUserProfile(adminProfile).catch(() => {});
+                      onAuthenticated(adminProfile);
+                    }}
+                    className="px-2 py-0.5 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-semibold transition cursor-pointer text-[10px] border border-amber-500/40 flex items-center gap-1"
+                    title="Sign in with sohanfardin546@gmail.com (Super Admin)"
+                  >
+                    <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                    Admin
+                  </button>
                   <button
                     type="button"
                     onClick={() => handleInstantDemoLogin('planner')}

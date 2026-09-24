@@ -83,6 +83,7 @@ import { AuthLandingPage } from './components/AuthLandingPage';
 import { IncidentReporter } from './components/IncidentReporter';
 import { DhakaMetroTracker } from './components/DhakaMetroTracker';
 import { WaterloggingMonitor } from './components/WaterloggingMonitor';
+import { AdminPanel } from './components/AdminPanel';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { IncidentReport } from './types/incident';
@@ -1175,6 +1176,15 @@ function AppContent() {
             weatherData={liveWeather}
             onNavigateToTab={setActiveTab}
             onBack={() => setActiveTab('overview')}
+          />
+        )}
+
+        {/* TAB: Admin User Management & Oversight */}
+        {activeTab === 'admin' && (
+          <AdminPanel
+            currentUserProfile={userProfile}
+            onProfileUpdated={handleProfileUpdated}
+            onNavigateTab={setActiveTab}
           />
         )}
       </main>

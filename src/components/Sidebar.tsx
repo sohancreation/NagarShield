@@ -16,6 +16,7 @@ import {
   Sliders,
   HeartPulse,
   Shield,
+  ShieldCheck,
   LogOut,
   Train,
   Waves,
@@ -153,6 +154,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
           id: 'simulator',
           label: t('simulator', 'Scenario Simulator'),
           icon: Sliders,
+        },
+      ],
+    },
+    {
+      title: t('administration', 'Administration'),
+      items: [
+        {
+          id: 'admin',
+          label: t('adminPanel', 'Admin User Control'),
+          icon: ShieldCheck,
+          meta: userProfile?.email?.toLowerCase() === 'sohanfardin546@gmail.com' ? 'ROOT' : 'PORTAL',
+          statusDot: userProfile?.email?.toLowerCase() === 'sohanfardin546@gmail.com' ? 'bg-amber-400' : undefined,
         },
       ],
     },

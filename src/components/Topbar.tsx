@@ -21,6 +21,7 @@ import {
   Bell,
   ArrowLeft,
   Languages,
+  ShieldCheck,
 } from 'lucide-react';
 import { UpazilaLocation, findNearestUpazila } from '../data/bangladeshLocations';
 import { LiveWeatherData } from '../types';
@@ -158,6 +159,12 @@ export const Topbar: React.FC<TopbarProps> = ({
       subtitle: 'Scenario modeling for signal retiming & culvert upgrades',
       titleBn: 'পরিস্থিতি সিমুলেটর',
       subtitleBn: 'কালভার্ট সম্প্রসারণ ও ট্রাফিক সিগন্যাল রূপরেখা',
+    },
+    admin: {
+      title: 'Admin Control Center',
+      subtitle: 'User account oversight, municipal registrations, and access governance',
+      titleBn: 'অ্যাডমিন নিয়ন্ত্রণ কেন্দ্র',
+      subtitleBn: 'ব্যবহারকারী অ্যাকাউন্ট ব্যবস্থাপনা এবং পৌরসভা প্রশাসন',
     },
   };
 
@@ -420,6 +427,21 @@ export const Topbar: React.FC<TopbarProps> = ({
 
         {/* Display Theme Mode Switcher (Light / Dark / Night OLED) */}
         <ThemeToggle variant="compact" />
+
+        {/* Admin Control Center Quick Toggle */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('admin')}
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+            activeTab === 'admin'
+              ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/40 ring-2 ring-amber-400/30 font-bold'
+              : 'bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+          }`}
+          title="Open Admin User Management"
+        >
+          <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
+          <span className="hidden sm:inline">Admin</span>
+        </button>
 
         {/* Small Circle Profile Button & Sign Out */}
         <div className="flex items-center gap-1.5">
