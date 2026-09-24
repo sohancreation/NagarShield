@@ -16,8 +16,7 @@ export interface ChatResponse {
 }
 
 export const DEFAULT_GEMINI_KEY =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) ||
-  'AIzaSyA8yty3ud_nvveJvI-HEj-sha8H5pj43JE';
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) || '';
 
 export function getStoredGeminiKey(): string {
   if (typeof window !== 'undefined') {

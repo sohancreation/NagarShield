@@ -6,8 +6,7 @@
 import { LiveWeatherData, WeatherForecastData, HourlyForecastItem, DailyForecastItem } from '../types';
 
 const OPENWEATHER_KEY =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OPENWEATHER_API_KEY) ||
-  'd349ea3084f654392a05a0e82010bf93';
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OPENWEATHER_API_KEY) || '';
 
 function buildFallbackWeather(city: string, lat = 23.8103, lon = 90.4125): LiveWeatherData {
   const norm = city.toLowerCase();

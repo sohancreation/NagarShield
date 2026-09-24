@@ -98,7 +98,7 @@ export const GoogleMapLocator: React.FC<GoogleMapLocatorProps> = ({
   const apiKey =
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
     (typeof window !== 'undefined' && (window as any).__GOOGLE_MAPS_API_KEY__) ||
-    'AIzaSyBFVcQ2AXe2OkZ50ipNeOwiwvKBxTNpLpo';
+    '';
 
   const [mapType, setMapType] = useState<google.maps.MapTypeId | 'roadmap' | 'satellite' | 'hybrid' | 'terrain'>('roadmap');
   const [showTraffic, setShowTraffic] = useState<boolean>(true);
